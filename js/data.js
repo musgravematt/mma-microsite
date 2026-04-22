@@ -1928,9 +1928,9 @@ const DeepAffexWebResultsData = (() => {
             "zh": "kg"
         },
         "DFXPOINT_UNIT:CELSIUS": {
-            "default": "°C",
-            "ko": "°C",
-            "zh": "°C"
+            "default": "°F",
+            "ko": "°F",
+            "zh": "°F"
         },
         "DFXPOINT_TITLE:SNR": {
             "default": "SNR",

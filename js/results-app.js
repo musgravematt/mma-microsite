@@ -220,7 +220,7 @@ function renderResultRow(result, pointDefinition, container, locale) {
     valueEl.textContent = `${formattedValue}`
 
     let unitEl = document.createElement('span')
-    if (pointDefinition.units !== "" && pointDefinition.units !== "PERCENT") {
+    if (pointDefinition.units !== "" && pointDefinition.units !== "PERCENT" && pointDefinition.key !== "BMI_CALC") {
         unitEl.className = `result-unit`
         unitEl.textContent = `${localize(`DFXPOINT_UNIT:${pointDefinition.units}`, locale)}`
     }
@@ -363,7 +363,8 @@ function getColorClass(value, pointDefinition) {
  */
 function formatResultValue(value, decimalPlaces, units, locale) {
     let isPercentageUnit = units == "PERCENT"
-    let roundedValue = roundToDecimalPlaces(value, decimalPlaces);
+    let displayValue = units === "CELSIUS" ? convertCelsiusToFahrenheit(value) : value
+    let roundedValue = roundToDecimalPlaces(displayValue, decimalPlaces);
     let convertedValue = isPercentageUnit ? roundedValue / 100 : roundedValue
     let options = { 
         maximumFractionDigits: decimalPlaces, 
@@ -375,6 +376,10 @@ function formatResultValue(value, decimalPlaces, units, locale) {
     } else {
         return new Intl.NumberFormat(locale, options).format(convertedValue)
     }
+}
+
+function convertCelsiusToFahrenheit(value) {
+    return (value * 9 / 5) + 32
 }
 
 /**
@@ -544,4 +549,3 @@ function renderDisclaimer(lang) {
     p.appendChild(text);
     container.appendChild(p);
 }
-
