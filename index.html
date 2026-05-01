@@ -766,7 +766,7 @@
                 email: payload.email,
                 encodedResults: payload.encodedResults,
                 encodedResultsForUrl: payload.encodedResultsForUrl,
-                resultsUrl: `${window.location.origin}${window.location.pathname}?r=${payload.encodedResultsForUrl}`,
+                resultsUrl: `${window.location.origin}${window.location.pathname}?r=${payload.encodedResultsForUrl}&skipGate=1`,
                 measurementTimestamp: payload.decodedResults.timestamp instanceof Date
                     ? payload.decodedResults.timestamp.toISOString()
                     : '',
