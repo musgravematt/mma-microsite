@@ -519,9 +519,22 @@ function shouldShowInfoIcon(pointKey) {
  */
 function renderHeader(lang) {
     let header = document.getElementById('main-header');
+    header.textContent = '';
+
+    let inner = document.createElement('div');
+    inner.className = 'brand-header-inner';
+
+    let logo = document.createElement('img');
+    logo.className = 'brand-logo';
+    logo.src = 'assets/imgs/beewell-logo.png';
+    logo.alt = 'BeeWell Functional Wellness';
+
     let title = document.createElement('h1');
-    title.textContent = localize("APP_NAME", lang);
-    header.appendChild(title);
+    title.textContent = `${localize("APP_NAME", lang)} Results`;
+
+    inner.appendChild(logo);
+    inner.appendChild(title);
+    header.appendChild(inner);
 }
 
 /**

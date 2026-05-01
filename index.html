@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MagicMirror™</title>
+    <title>BeeWell MagicMirror™ Results</title>
     <script src="js/vendor/float16.min.js"></script>
     <script>
         const {
@@ -17,21 +17,81 @@
     <script src="js/results-app.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,200..800;1,200..800&family=Playfair+Display:wght@600;700&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
     <style>
         body {
-            font-family: "Work Sans", sans-serif;
+            font-family: "Karla", "Work Sans", sans-serif;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            background: #ffffff;
         }
 
         #main-header {
-            text-align: center;
-            color: #F65F77;
-            font-weight: 600;
-            margin: 20px 0;
+            width: 100%;
+            margin: 0 0 2rem;
+            padding: 0.95rem 1rem;
+            box-sizing: border-box;
+            color: #282120;
+            background: #c4a96c;
+            font-family: "Karla", "Work Sans", sans-serif;
+        }
+
+        .brand-header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            width: min(100%, 72rem);
+            margin: 0 auto;
+        }
+
+        .brand-logo {
+            display: block;
+            width: 16rem;
+            max-width: 58vw;
+            height: auto;
+            flex-shrink: 1;
+        }
+
+        #main-header h1 {
+            margin: 0;
+            border-radius: 999px;
+            background: #282120;
+            color: #ffffff;
+            font-family: "Karla", "Work Sans", sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0;
+            line-height: 1;
+            padding: 0.75rem 1.8rem;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 520px) {
+            #main-header {
+                margin-top: 0.75rem;
+                padding: 1rem;
+            }
+
+            .brand-header-inner {
+                flex-direction: column;
+                gap: 0.85rem;
+            }
+
+            .brand-logo {
+                width: 15rem;
+                max-width: 100%;
+            }
+
+            #main-header h1 {
+                width: 100%;
+                box-sizing: border-box;
+                font-size: 0.9rem;
+                text-align: center;
+            }
         }
 
         a {
@@ -52,7 +112,7 @@
         }
 
         .result-clickable:focus {
-            outline: 2px solid #255be3;
+            outline: 2px solid #c4a96c;
             outline-offset: 4px;
         }
 
@@ -63,13 +123,13 @@
             left: 0;
             right: 0;
             bottom: -5px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #c4a96c;
         }
         .result-icon {
             margin-right: 10px;
             width: 30px;
             height: 30px;
-            color: #023676;
+            color: #282120;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -101,8 +161,8 @@
 
         .result-info-icon {
             border: 1px solid transparent;
-            background-color: rgba(2, 54, 118, 0.08);
-            color: #023676;
+            background-color: rgba(196, 169, 108, 0.22);
+            color: #282120;
             border-radius: 50%;
             width: 14px;
             height: 14px;
@@ -145,7 +205,7 @@
         h2 {
             position: relative;
             padding-bottom: 5px;
-            color: #023676;
+            color: #c4a96c;
         }
 
         h2::after {
@@ -154,7 +214,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            border-bottom: 1px solid #255be3;
+            border-bottom: 1px solid #c4a96c;
         }
 
         .star {
@@ -211,10 +271,10 @@
             width: min(100%, 34rem);
             margin: 2.5rem auto 3rem;
             padding: 2rem;
-            border: 1px solid #dce6f6;
+            border: 1px solid #c4a96c;
             border-radius: 8px;
-            background: #ffffff;
-            box-shadow: 0 18px 45px rgba(2, 54, 118, 0.12);
+            background: #f7f3ec;
+            box-shadow: 0 18px 45px rgba(40, 33, 32, 0.12);
         }
 
         .lead-capture[hidden],
@@ -235,7 +295,7 @@
         }
 
         .lead-capture p {
-            color: #4d5b6c;
+            color: #413625;
             line-height: 1.5;
             margin: 0.5rem 0 1.5rem;
         }
@@ -246,7 +306,7 @@
 
         .lead-capture label {
             display: block;
-            color: #023676;
+            color: #282120;
             font-weight: 600;
             margin-bottom: 0.35rem;
         }
@@ -254,24 +314,24 @@
         .lead-capture input {
             width: 100%;
             box-sizing: border-box;
-            border: 1px solid #bcc9d9;
+            border: 1px solid #c4a96c;
             border-radius: 6px;
             font: inherit;
             padding: 0.85rem 0.95rem;
-            color: #172033;
+            color: #282120;
             background: #ffffff;
         }
 
         .lead-capture input:focus {
-            border-color: #255be3;
-            outline: 3px solid rgba(37, 91, 227, 0.16);
+            border-color: #282120;
+            outline: 3px solid rgba(196, 169, 108, 0.28);
         }
 
         .lead-capture button {
             width: 100%;
             border: 0;
             border-radius: 6px;
-            background: #023676;
+            background: #282120;
             color: #ffffff;
             cursor: pointer;
             font: inherit;
@@ -282,7 +342,7 @@
 
         .lead-capture button:hover,
         .lead-capture button:focus {
-            background: #255be3;
+            background: #413625;
         }
 
         .lead-capture button:disabled {
@@ -298,7 +358,7 @@
         }
 
         .lead-capture-note {
-            color: #667085;
+            color: #6b6b6b;
             font-size: 0.85rem;
             margin-top: 1rem;
             line-height: 1.4;
