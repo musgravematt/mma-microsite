@@ -728,6 +728,7 @@
                         firstName,
                         email,
                         encodedResults: encodedResultsQueryString,
+                        encodedResultsForUrl: encodeURIComponent(encodedResultsQueryString),
                         decodedResults,
                         readableResults,
                     });
@@ -753,6 +754,8 @@
                 firstName: payload.firstName,
                 email: payload.email,
                 encodedResults: payload.encodedResults,
+                encodedResultsForUrl: payload.encodedResultsForUrl,
+                resultsUrl: `${window.location.origin}${window.location.pathname}?r=${payload.encodedResultsForUrl}`,
                 measurementTimestamp: payload.decodedResults.timestamp instanceof Date
                     ? payload.decodedResults.timestamp.toISOString()
                     : '',
