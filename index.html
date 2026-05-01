@@ -679,6 +679,16 @@
                 return;
             }
 
+            if (shouldSkipLeadGate()) {
+                showResults({
+                    decodedResults,
+                    definitions,
+                    sections,
+                    lang,
+                });
+                return;
+            }
+
             prepareLeadCapture({
                 decodedResults,
                 definitions,
@@ -734,11 +744,12 @@
                     });
 
                     leadCapture.hidden = true;
-                    document.getElementById('results-shell').hidden = false;
-                    document.querySelector('footer').hidden = false;
-                    renderResults(decodedResults, definitions.pointDefinitions, sections, lang);
-                    renderDisclaimer(lang);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    showResults({
+                        decodedResults,
+                        definitions,
+                        sections,
+                        lang,
+                    });
                 } catch (error) {
                     console.error(error);
                     status.textContent = error.message || 'We could not save your details. Please try again.';
@@ -800,6 +811,14 @@
             return readableResults;
         }
 
+        function showResults({ decodedResults, definitions, sections, lang }) {
+            document.getElementById('results-shell').hidden = false;
+            document.querySelector('footer').hidden = false;
+            renderResults(decodedResults, definitions.pointDefinitions, sections, lang);
+            renderDisclaimer(lang);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function renderResultsError(message) {
             const mainContainer = document.getElementById('main-container');
             const errorContainer = document.createElement('div');
@@ -817,6 +836,13 @@
             const urlParams = new URLSearchParams(window.location.search)
             const resultQuery = urlParams.get('r')
             return resultQuery
+        }
+
+        function shouldSkipLeadGate() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const value = urlParams.get('skipGate');
+
+            return value === '1' || value === 'true' || value === 'yes';
         }
 
         /**
