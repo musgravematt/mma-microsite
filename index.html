@@ -722,9 +722,14 @@
                 submitButton.textContent = 'Loading results...';
 
                 try {
+                    const readableResults = buildReadableResults(decodedResults, definitions.pointDefinitions);
+
                     await saveLeadCapture({
                         firstName,
                         email,
+                        encodedResults: encodedResultsQueryString,
+                        decodedResults,
+                        readableResults,
                     });
 
                     leadCapture.hidden = true;
@@ -747,6 +752,15 @@
             const formBody = new URLSearchParams({
                 firstName: payload.firstName,
                 email: payload.email,
+                encodedResults: payload.encodedResults,
+                measurementTimestamp: payload.decodedResults.timestamp instanceof Date
+                    ? payload.decodedResults.timestamp.toISOString()
+                    : '',
+                decodedResultsJson: JSON.stringify(payload.readableResults),
+            });
+
+            Object.entries(payload.readableResults).forEach(([key, value]) => {
+                formBody.append(`result_${key}`, String(value));
             });
 
             await fetch(zapierWebhookUrl, {
@@ -757,6 +771,30 @@
                 },
                 body: formBody.toString(),
             });
+        }
+
+        function buildReadableResults(decodedResults, pointDefinitions) {
+            const readableResults = {};
+
+            Object.keys(pointDefinitions).forEach((pointKey) => {
+                const value = getPointResult(pointKey, decodedResults);
+
+                if (value === undefined || isNaN(value)) {
+                    return;
+                }
+
+                readableResults[pointKey] = value;
+            });
+
+            ['SNR', 'STAR_RATING'].forEach((pointKey) => {
+                const value = getPointResult(pointKey, decodedResults);
+
+                if (value !== undefined && !isNaN(value)) {
+                    readableResults[pointKey] = value;
+                }
+            });
+
+            return readableResults;
         }
 
         function renderResultsError(message) {
