@@ -19,14 +19,16 @@ cd mma-microsite-demo
 
 ### 2. Start a Local HTTP Server
 
-With Python (3.x):
+This project includes a small Node server so lead captures can be sent to Zapier before results are displayed:
+
 ```bash
-python -m http.server 8080
+npm start
 ```
 
-With Node.js:
+Lead captures are sent to the configured Zapier webhook. To override the default webhook locally:
+
 ```bash
-npx http-server -p 8080
+ZAPIER_WEBHOOK_URL="https://hooks.zapier.com/hooks/catch/..." npm start
 ```
 
 ### 3. Open in Your Browser

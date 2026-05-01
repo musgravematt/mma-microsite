@@ -207,6 +207,114 @@
             margin: 1em;
         }
 
+        .lead-capture {
+            width: min(100%, 34rem);
+            margin: 2.5rem auto 3rem;
+            padding: 2rem;
+            border: 1px solid #dce6f6;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 18px 45px rgba(2, 54, 118, 0.12);
+        }
+
+        .lead-capture[hidden],
+        .results-shell[hidden],
+        footer[hidden] {
+            display: none;
+        }
+
+        .lead-capture h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .lead-capture h2::after {
+            right: auto;
+            width: 4rem;
+        }
+
+        .lead-capture p {
+            color: #4d5b6c;
+            line-height: 1.5;
+            margin: 0.5rem 0 1.5rem;
+        }
+
+        .lead-capture-field {
+            margin-bottom: 1rem;
+        }
+
+        .lead-capture label {
+            display: block;
+            color: #023676;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .lead-capture input {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #bcc9d9;
+            border-radius: 6px;
+            font: inherit;
+            padding: 0.85rem 0.95rem;
+            color: #172033;
+            background: #ffffff;
+        }
+
+        .lead-capture input:focus {
+            border-color: #255be3;
+            outline: 3px solid rgba(37, 91, 227, 0.16);
+        }
+
+        .lead-capture button {
+            width: 100%;
+            border: 0;
+            border-radius: 6px;
+            background: #023676;
+            color: #ffffff;
+            cursor: pointer;
+            font: inherit;
+            font-weight: 700;
+            padding: 0.95rem 1rem;
+            margin-top: 0.35rem;
+        }
+
+        .lead-capture button:hover,
+        .lead-capture button:focus {
+            background: #255be3;
+        }
+
+        .lead-capture button:disabled {
+            cursor: wait;
+            opacity: 0.72;
+        }
+
+        .lead-capture-status {
+            min-height: 1.35rem;
+            margin-top: 0.85rem;
+            color: #b42318;
+            font-size: 0.95rem;
+        }
+
+        .lead-capture-note {
+            color: #667085;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            line-height: 1.4;
+        }
+
+        .results-error {
+            width: min(100%, 42rem);
+            margin: 2.5rem auto;
+            padding: 1.25rem;
+            border: 1px solid #f3b2bd;
+            border-radius: 8px;
+            color: #7a1724;
+            background: #fff5f7;
+            line-height: 1.5;
+        }
+
         #measurementInfo {
             height: 1.5em;
             align-content: center;
@@ -521,11 +629,30 @@
 <body>
     <div id="main-container">
         <div id="main-header"></div>
-        <div id="measurementInfo"></div>
-        <div id="timestamp"></div>
-        <div id="results-container"></div>
+        <section id="lead-capture" class="lead-capture" aria-labelledby="lead-capture-title" hidden>
+            <h2 id="lead-capture-title">View your results</h2>
+            <p>Enter your first name and email to continue to your MagicMirror results.</p>
+            <form id="lead-capture-form" novalidate>
+                <div class="lead-capture-field">
+                    <label for="lead-first-name">First Name</label>
+                    <input id="lead-first-name" name="firstName" type="text" autocomplete="given-name" required maxlength="80">
+                </div>
+                <div class="lead-capture-field">
+                    <label for="lead-email">Email</label>
+                    <input id="lead-email" name="email" type="email" autocomplete="email" required maxlength="254">
+                </div>
+                <button id="lead-submit" type="submit">Show my results</button>
+                <div id="lead-capture-status" class="lead-capture-status" role="status" aria-live="polite"></div>
+            </form>
+            <div class="lead-capture-note">We use this information to connect you with your measurement results.</div>
+        </section>
+        <div id="results-shell" class="results-shell" hidden>
+            <div id="measurementInfo"></div>
+            <div id="timestamp"></div>
+            <div id="results-container"></div>
+        </div>
     </div>
-    <footer>
+    <footer hidden>
         <div id="disclaimer-container"></div>
     </footer>
     <script>
@@ -533,14 +660,118 @@
             let definitions = DeepAffexWebResultsData.definitions
             let sections = DeepAffexWebResultsData.sections
             let encodedResultsQueryString = getResultsFromQueryString()
-            let decodedResults = decodeNuraQRString(encodedResultsQueryString)
 
             let lang = getLangFromBrowser();
 
             renderHeader(lang);
-            renderResults(decodedResults, definitions.pointDefinitions, sections, lang);
-            renderDisclaimer(lang);
+
+            if (!encodedResultsQueryString) {
+                renderResultsError('A results link is required to view this page.');
+                return;
+            }
+
+            let decodedResults;
+            try {
+                decodedResults = decodeNuraQRString(encodedResultsQueryString)
+            } catch (error) {
+                console.error(error);
+                renderResultsError('This results link could not be read. Please check the link and try again.');
+                return;
+            }
+
+            prepareLeadCapture({
+                decodedResults,
+                definitions,
+                sections,
+                encodedResultsQueryString,
+                lang,
+            });
         });
+
+        function prepareLeadCapture({ decodedResults, definitions, sections, encodedResultsQueryString, lang }) {
+            const leadCapture = document.getElementById('lead-capture');
+            const form = document.getElementById('lead-capture-form');
+            const firstNameInput = document.getElementById('lead-first-name');
+            const emailInput = document.getElementById('lead-email');
+            const submitButton = document.getElementById('lead-submit');
+            const status = document.getElementById('lead-capture-status');
+
+            leadCapture.hidden = false;
+            firstNameInput.focus();
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                status.textContent = '';
+
+                const firstName = firstNameInput.value.trim();
+                const email = emailInput.value.trim();
+
+                if (!firstName) {
+                    status.textContent = 'Please enter your first name.';
+                    firstNameInput.focus();
+                    return;
+                }
+
+                if (!emailInput.validity.valid) {
+                    status.textContent = 'Please enter a valid email address.';
+                    emailInput.focus();
+                    return;
+                }
+
+                submitButton.disabled = true;
+                submitButton.textContent = 'Loading results...';
+
+                try {
+                    await saveLeadCapture({
+                        firstName,
+                        email,
+                    });
+
+                    leadCapture.hidden = true;
+                    document.getElementById('results-shell').hidden = false;
+                    document.querySelector('footer').hidden = false;
+                    renderResults(decodedResults, definitions.pointDefinitions, sections, lang);
+                    renderDisclaimer(lang);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } catch (error) {
+                    console.error(error);
+                    status.textContent = error.message || 'We could not save your details. Please try again.';
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Show my results';
+                }
+            });
+        }
+
+        async function saveLeadCapture(payload) {
+            const response = await fetch('/api/leads', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                let message = 'We could not save your details. Please try again.';
+                try {
+                    const body = await response.json();
+                    if (body.error) {
+                        message = body.error;
+                    }
+                } catch {
+                    // Keep the generic message when the server did not return JSON.
+                }
+                throw new Error(message);
+            }
+        }
+
+        function renderResultsError(message) {
+            const mainContainer = document.getElementById('main-container');
+            const errorContainer = document.createElement('div');
+            errorContainer.className = 'results-error';
+            errorContainer.textContent = message;
+            mainContainer.appendChild(errorContainer);
+        }
 
 
         /**
