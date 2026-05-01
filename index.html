@@ -743,26 +743,20 @@
         }
 
         async function saveLeadCapture(payload) {
-            const response = await fetch('/api/leads', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
+            const zapierWebhookUrl = 'https://hooks.zapier.com/hooks/catch/17707301/uvgp73g/';
+            const formBody = new URLSearchParams({
+                firstName: payload.firstName,
+                email: payload.email,
             });
 
-            if (!response.ok) {
-                let message = 'We could not save your details. Please try again.';
-                try {
-                    const body = await response.json();
-                    if (body.error) {
-                        message = body.error;
-                    }
-                } catch {
-                    // Keep the generic message when the server did not return JSON.
-                }
-                throw new Error(message);
-            }
+            await fetch(zapierWebhookUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                },
+                body: formBody.toString(),
+            });
         }
 
         function renderResultsError(message) {

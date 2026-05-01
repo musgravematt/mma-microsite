@@ -19,17 +19,13 @@ cd mma-microsite-demo
 
 ### 2. Start a Local HTTP Server
 
-This project includes a small Node server so lead captures can be sent to Zapier before results are displayed:
+This project can be served by any static host. For local testing, start the included static server:
 
 ```bash
 npm start
 ```
 
-Lead captures are sent to the configured Zapier webhook. To override the default webhook locally:
-
-```bash
-ZAPIER_WEBHOOK_URL="https://hooks.zapier.com/hooks/catch/..." npm start
-```
+Lead captures are sent directly from the browser to the configured Zapier webhook before results are displayed.
 
 ### 3. Open in Your Browser
 Visit this URL to see the demo in action with a sample encoded results string:
